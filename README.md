@@ -1,6 +1,17 @@
 ### This is a python module version of ExLlama
 The pupose of this is to allow for one-time building of the CUDA kernels.
 
+To build the module, install the CUDA Toolkit along with the appropriate Pytorch version that you intend to use.
+Full list of requirements are listed below. After this, clone the repo and install the module with:
+```
+python -m pip install /path/to/exllama
+```
+Or you can build a wheel with:
+```
+python -m pip wheel /path/to/exllama --no-deps
+```
+The CUDA version used to build the wheel will be appended to the version number automatically.
+
 ---
 
 # ExLlama
