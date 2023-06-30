@@ -12,6 +12,8 @@ python -m pip wheel git+https://github.com/jllllll/exllama --no-deps
 ```
 The CUDA version used to build the wheel will be appended to the version number automatically.
 
+Pre-built wheels are available in the releases.
+
 ---
 
 # ExLlama
