@@ -4,7 +4,7 @@ on: workflow_dispatch
 
 jobs:
   build_wheels:
-    name: Build wheels for ${{ matrix.os }}
+    name: ${{ matrix.os }} Python ${{ matrix.pyver }} CUDA ${{ matrix.cuda }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
