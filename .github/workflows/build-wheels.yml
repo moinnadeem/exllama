@@ -10,6 +10,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, windows-latest]
         pyver: ["3.8", "3.9", "3.10"]
+        cuda: ["11.7.0", "11.8.0"]
     defaults:
       run:
         shell: pwsh
@@ -33,15 +34,20 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          mamba install -y 'cuda' -c 'nvidia/label/cuda-11.7.0'
-          python -m pip install build wheel torch==2.0.1+cu117 safetensors sentencepiece ninja --extra-index-url https://download.pytorch.org/whl/cu117
+          $cudaVersion = $env:CUDAVER
+          $cudaVersionPytorch = $env:CUDAVER.Remove($env:CUDAVER.LastIndexOf('.')).Replace('.','')
+          $cudaChannels = ''
+          $cudaNum = [int]$cudaVersion.substring($cudaVersion.LastIndexOf('.')+1)
+          while ($cudaNum -ge 0) { $cudaChannels += '-c nvidia/label/cuda-' + $cudaVersion.Remove($cudaVersion.LastIndexOf('.')+1) + $cudaNum + ' '; $cudaNum-- }
+          mamba install -y 'cuda' $cudaChannels.TrimEnd().Split()
+          python -m pip install build wheel "torch==2.0.1+$cudaVersionPytorch" safetensors sentencepiece ninja --extra-index-url "https://download.pytorch.org/whl/$cudaVersionPytorch"
         
       - name: Build Wheel
         run: |
           $env:CUDA_PATH = $env:CONDA_PREFIX
           $env:CUDA_HOME = $env:CONDA_PREFIX
           if ($IsLinux) {$env:LD_LIBRARY_PATH = $env:CONDA_PREFIX + '/lib:' + $env:LD_LIBRARY_PATH}
-          $env:TORCH_CUDA_ARCH_LIST = '6.0 6.1 7.0 7.5 8.0 8.6+PTX'
+          $env:TORCH_CUDA_ARCH_LIST = if ([version]$env:CUDAVER -lt [version]'11.8') {'6.0 6.1 7.0 7.5 8.0 8.6+PTX'} else {'6.0 6.1 7.0 7.5 8.0 8.6 8.9 9.0+PTX'}
           python -m build -n --wheel
         
       - uses: actions/upload-artifact@v3
