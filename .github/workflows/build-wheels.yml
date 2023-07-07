@@ -42,7 +42,7 @@ jobs:
           $cudaNum = [int]$cudaVersion.substring($cudaVersion.LastIndexOf('.')+1)
           while ($cudaNum -ge 0) { $cudaChannels += '-c nvidia/label/cuda-' + $cudaVersion.Remove($cudaVersion.LastIndexOf('.')+1) + $cudaNum + ' '; $cudaNum-- }
           mamba install -y 'cuda' $cudaChannels.TrimEnd().Split()
-          python -m pip install build wheel "torch==2.0.1+$cudaVersionPytorch" safetensors sentencepiece ninja --extra-index-url "https://download.pytorch.org/whl/$cudaVersionPytorch"
+          python -m pip install build wheel "torch==2.0.1+cu$cudaVersionPytorch" safetensors sentencepiece ninja --extra-index-url "https://download.pytorch.org/whl/cu$cudaVersionPytorch"
         
       - name: Build Wheel
         run: |
