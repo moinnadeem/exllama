@@ -10,7 +10,8 @@ Or you can build a wheel with:
 ```
 python -m pip wheel git+https://github.com/jllllll/exllama --no-deps
 ```
-The CUDA version used to build the wheel will be appended to the version number automatically.
+The CUDA version used to build the wheel will be appended to the version number automatically.  
+ROCm version can be appended by defining the `ROCM_VERSION` environment variable: `ROCM_VERSION=5.4.2`
 
 Pre-built wheels are available in the releases.
 

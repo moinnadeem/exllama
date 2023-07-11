@@ -13,7 +13,8 @@ def get_cuda_version(cuda_home=os.environ.get('CUDA_PATH', '') if platform.syste
     idx=version_str.find("release")
     return version_str[idx+len("release "):idx+len("release ")+4]
     
-CUDA_VERSION = "".join(get_cuda_version().split("."))
+CUDA_VERSION = "".join(get_cuda_version().split(".")) if not os.environ.get('ROCM_VERSION', False) else False
+ROCM_VERSION = os.environ.get('ROCM_VERSION', False) if torch.version.hip else False
 
 extra_compile_args = {
     "cxx": ["-O3"],
@@ -22,7 +23,7 @@ extra_compile_args = {
 if torch.version.hip:
     extra_compile_args["nvcc"].append("-U__HIP_NO_HALF_CONVERSIONS__")
 
-version = "0.0.6" + (f"+cu{CUDA_VERSION}" if CUDA_VERSION else "")
+version = "0.0.6" + (f"+cu{CUDA_VERSION}" if CUDA_VERSION else f"+rocm{ROCM_VERSION}" if ROCM_VERSION else "")
 setup(
     name="exllama",
     version=version,
