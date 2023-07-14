@@ -21,8 +21,7 @@ jobs:
           android: true
           dotnet: true
           haskell: true
-          large-packages: true
-          docker-images: true
+          large-packages: false
           swap-storage: false
     
       - uses: actions/checkout@v3
