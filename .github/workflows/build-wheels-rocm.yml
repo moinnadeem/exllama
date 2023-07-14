@@ -11,6 +11,17 @@ jobs:
         pyver: ["3.8", "3.9", "3.10"]
 
     steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@v1.2.0
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+    
       - uses: actions/checkout@v3
       - uses: actions/checkout@v3
         with:
