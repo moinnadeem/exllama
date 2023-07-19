@@ -1,4 +1,4 @@
-name: Build Wheels & Release
+name: Fix Release
 
 on: workflow_dispatch
 
