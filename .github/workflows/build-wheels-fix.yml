@@ -22,6 +22,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: 'wheel-fix'
       - uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.pyver }}
