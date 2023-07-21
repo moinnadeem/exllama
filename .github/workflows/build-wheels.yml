@@ -56,3 +56,8 @@ jobs:
         with:
           name: 'wheels'
           path: ./dist/*.whl
+          
+  build_rocm:
+    name: Build ROCm Wheels
+    needs: build_wheels
+    uses: ./.github/workflows/build-wheels-rocm.yml

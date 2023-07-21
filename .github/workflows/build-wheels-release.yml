@@ -50,7 +50,7 @@ jobs:
       - name: Build Wheel
         id: build-wheel
         run: |
-          if ($(Get-Content 'setup.py' -raw) -match 'version = "(\d+\.(?:\d+\.?)*)" \+ \(') {Write-Output $('::notice file=build-wheels-release.yml,line=41,title=Package Version::Detected package version is: {0}' -f $Matches[1]); Write-Output "PACKAGE_VERSION=$($Matches[1])" >> "$env:GITHUB_OUTPUT"} else {Write-Output '::error file=build-wheels-release.yml,line=41::Could not parse version from setup.py! You must upload wheels manually!'; Write-Output "PACKAGE_VERSION=None" >> "$env:GITHUB_OUTPUT"}
+          if ($(Get-Content 'setup.py' -raw) -match 'version = "(\d+\.(?:\d+\.?)*)" \+ \(') {Write-Output $('::notice file=build-wheels-release.yml,line=53,title=Package Version::Detected package version is: {0}' -f $Matches[1]); Write-Output "PACKAGE_VERSION=$($Matches[1])" >> "$env:GITHUB_OUTPUT"} else {Write-Output '::error file=build-wheels-release.yml,line=41::Could not parse version from setup.py! You must upload wheels manually!'; Write-Output "PACKAGE_VERSION=None" >> "$env:GITHUB_OUTPUT"}
           $env:CUDA_PATH = $env:CONDA_PREFIX
           $env:CUDA_HOME = $env:CONDA_PREFIX
           if ($IsLinux) {$env:LD_LIBRARY_PATH = $env:CONDA_PREFIX + '/lib:' + $env:LD_LIBRARY_PATH}
@@ -72,3 +72,8 @@ jobs:
           overwrite: true
           release_name: ${{ steps.build-wheel.outputs.PACKAGE_VERSION }}
           body: "Wheels are compiled with CUDA 11.7 and 11.8 for Windows and Linux x64"
+          
+  build_rocm:
+    name: Build ROCm Wheels & Release
+    needs: build_wheels
+    uses: ./.github/workflows/build-wheels-release-rocm.yml

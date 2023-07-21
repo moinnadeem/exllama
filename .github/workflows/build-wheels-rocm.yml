@@ -1,6 +1,8 @@
 name: Build ROCm 5.4.2 Wheels
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  workflow_call:
 
 jobs:
   build_wheels:
@@ -22,20 +24,9 @@ jobs:
           swap-storage: false
     
       - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
-        with:
-          repository: 'ROCmSoftwarePlatform/rocPRIM'
-          ref: 'rocm-5.4.2'
-          path: 'rocPRIM'
-      - uses: actions/checkout@v3
-        with:
-          repository: 'ROCmSoftwarePlatform/rocThrust'
-          ref: 'rocm-5.4.2'
-          path: 'rocThrust'
           
       - name: Install ROCm SDK
         run: |
-          sudo apt-get clean
           [ ! -d /etc/apt/keyrings ] && sudo mkdir --parents --mode=0755 /etc/apt/keyrings
           wget https://repo.radeon.com/rocm/rocm.gpg.key -O - | gpg --dearmor | sudo tee /etc/apt/keyrings/rocm.gpg > /dev/null
           echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/5.4.2 focal main" | sudo tee --append /etc/apt/sources.list.d/rocm.list
