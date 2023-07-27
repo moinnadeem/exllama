@@ -21,6 +21,17 @@ jobs:
       CUDAVER: ${{ matrix.cuda }}
 
     steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@v1.2.0
+        if: runner.os == 'Linux'
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          swap-storage: false
+          
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
         with:
