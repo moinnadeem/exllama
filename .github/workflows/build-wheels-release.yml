@@ -13,7 +13,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, windows-latest]
         pyver: ["3.8", "3.9", "3.10"]
-        cuda: ["11.7.0", "11.8.0"]
+        cuda: ["11.7.0", "11.8.0", "12.1.1"]
     defaults:
       run:
         shell: pwsh
@@ -56,7 +56,9 @@ jobs:
           $cudaNum = [int]$cudaVersion.substring($cudaVersion.LastIndexOf('.')+1)
           while ($cudaNum -ge 0) { $cudaChannels += '-c nvidia/label/cuda-' + $cudaVersion.Remove($cudaVersion.LastIndexOf('.')+1) + $cudaNum + ' '; $cudaNum-- }
           mamba install -y 'cuda' $cudaChannels.TrimEnd().Split()
-          python -m pip install build wheel "torch==2.0.1+cu$cudaVersionPytorch" safetensors sentencepiece ninja --extra-index-url "https://download.pytorch.org/whl/cu$cudaVersionPytorch"
+          if ([version]$env:CUDAVER -gt [version]'11.8') {$torchver = "--pre --index-url https://download.pytorch.org/whl/nightly/cu$cudaVersionPytorch"} else {$torchver = "--index-url https://download.pytorch.org/whl/cu$cudaVersionPytorch"}
+          python -m pip install torch $torchver.split()
+          python -m pip install build wheel safetensors sentencepiece ninja
         
       - name: Build Wheel
         id: build-wheel
