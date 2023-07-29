@@ -53,7 +53,7 @@ jobs:
           $cudaNum = [int]$cudaVersion.substring($cudaVersion.LastIndexOf('.')+1)
           while ($cudaNum -ge 0) { $cudaChannels += '-c nvidia/label/cuda-' + $cudaVersion.Remove($cudaVersion.LastIndexOf('.')+1) + $cudaNum + ' '; $cudaNum-- }
           mamba install -y 'cuda' $cudaChannels.TrimEnd().Split()
-          if ([version]$env:CUDAVER -gt [version]'11.8') {$torchver = "--pre --index-url https://download.pytorch.org/whl/nightly/cu$cudaVersionPytorch"} else {$torchver = "--index-url https://download.pytorch.org/whl/cu$cudaVersionPytorch"}
+          if ([version]$env:CUDAVER -gt [version]'11.8.0') {$torchver = "--pre --index-url https://download.pytorch.org/whl/nightly/cu$cudaVersionPytorch"} else {$torchver = "--index-url https://download.pytorch.org/whl/cu$cudaVersionPytorch"}
           python -m pip install torch $torchver.split()
           python -m pip install build wheel safetensors sentencepiece ninja
         
