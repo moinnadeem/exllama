@@ -81,7 +81,7 @@ class ExLlamaLora:
 
             # Check that shape is compatible
             if not isinstance(target_module, Ex4bitLinear):
-                print(f"error with key {key}, decoder_idx {decoder_idx}, target module {target_module} has type {type(target_module)}, not Ex4bitLinear")
+                print(f"error with key {key}, target module {target_module} has type {type(target_module)}, not {Ex4bitLinear}")
 
             if lora_half == "lora_A":
                 in_features = tensor.shape[1]
