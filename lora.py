@@ -1,12 +1,12 @@
 from model import ExLlamaConfig, Ex4bitLinear
+from pathlib import Path
 import torch
 import json
+import safetensors
 from safetensors.torch import load_file as safe_load_file
 from torch import load as load_file
 
 class ExLlamaLora:
-
-    lora_config_path: str
     lora_path: str
     lora_r: int
     lora_alpha: float
@@ -15,19 +15,22 @@ class ExLlamaLora:
     tensors: dict[torch.tensor]
     bias_ignored: bool
 
-    def __init__(self, model, lora_config_path, lora_path):
 
-        self.lora_config_path = lora_config_path
-        self.lora_path = lora_path
+    def __init__(self, model, lora_config: Path | bytes, lora_weights: Path | bytes, use_safetensors: bool = False):
+        self.lora_path = "in_memory_training"
+        self.lora_config = lora_config
+        self.lora_weights = lora_weights
         self.model = model
         self.config = model.config
         self.tensors = {}
         self.bias_ignored = False
 
         # Grab relevant items from LoRA config
-
-        with open(lora_config_path) as f:
-            read_config = json.load(f)
+        if isinstance(lora_config, Path):
+            with open(lora_config) as f:
+                read_config = json.loads(f)
+        else:
+            read_config = json.loads(lora_config)
 
         self.lora_r = read_config["r"]
         self.lora_alpha = float(read_config["lora_alpha"])
@@ -37,11 +40,18 @@ class ExLlamaLora:
             raise ValueError(" ## Error: fan_in_fan_out mode not supported.")
 
         # Load LoRA weights
-
-        if self.lora_path.endswith(".safetensors"):
-            f = safe_load_file(self.lora_path, device = "cpu")
+        if isinstance(lora_weights, Path):
+            self.lora_path = str(lora_weights)
+            if str(lora_weights).endswith(".safetensors"):
+                safetensors.torch.load(...)
+                f = safe_load_file(str(lora_weights), device = "cpu")
+            else:
+                f = load_file(lora_weights, map_location = "cpu")
         else:
-            f = load_file(self.lora_path, map_location = "cpu")
+            if use_safetensors:
+                f = safetensors.torch.load(lora_weights, device="cpu")
+            else:
+                f = torch.load(lora_weights, map_location = "cpu")
 
         for key in f.keys():
             tensor = f[key]
@@ -119,6 +129,7 @@ class ExLlamaLora:
             # Move to target device
 
             device = self.config.device_map.map(target_key)
+            # optional? seems to be cuda:0 except for embed_tokens, unless auto_map is set...?
             tensor = tensor.to(device, non_blocking = True)
 
             # Store adapter tensor
