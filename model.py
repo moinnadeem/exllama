@@ -47,9 +47,9 @@ class ExLlamaConfig:
 
         # Loaded/automatic settings
 
-        self.bos_token_id = read_config["bos_token_id"]  # Note that the HF LlamaTokenizer doesn't seem to recognize these automatically
-        self.eos_token_id = read_config["eos_token_id"]
-        self.pad_token_id = read_config["pad_token_id"]
+        self.bos_token_id = read_config["bos_token_id"] if "bos_token_id" in read_config else 1
+        self.eos_token_id = read_config["eos_token_id"] if "eos_token_id" in read_config else 2
+        self.pad_token_id = read_config["pad_token_id"] if "pad_token_id" in read_config else 0
 
         self.hidden_size = read_config["hidden_size"]
         self.initializer_range = read_config["initializer_range"]
@@ -66,7 +66,7 @@ class ExLlamaConfig:
             self.num_key_value_heads = self.num_attention_heads
             self.num_key_value_groups = 1
 
-        self.rotary_embedding_base = 10000  # Constant used for pretrained models, leave as is unless retraining
+        self.rotary_embedding_base = read_config["rope_theta"] if "rope_theta" in read_config else 10000.0
         self.head_dim = self.hidden_size // self.num_attention_heads
 
         self.groupsize = None  # Autodetected
@@ -363,7 +363,7 @@ class ExLlamaAttention:
                                      self.config.head_dim,
                                      cache.key_states[self.index],
                                      cache.value_states[self.index],
-                                     self.config.max_seq_len,
+                                     cache.max_seq_len,
                                      q_a, q_b,
                                      k_a, k_b,
                                      v_a, v_b,
@@ -955,7 +955,7 @@ class ExLlama:
                 max_a = self.config.max_attention_size
                 if attn_size > max_a:
                     cs = (math.sqrt(past_len ** 2 + 4 * max_a) - past_len) / 2
-                    chunk_size = math.floor(cs)
+                    chunk_size = min(chunk_size, math.floor(cs))
 
             # Process chunk
 
