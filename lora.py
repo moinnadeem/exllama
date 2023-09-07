@@ -1,10 +1,10 @@
-from model import ExLlamaConfig, Ex4bitLinear
-from pathlib import Path
-import torch
 import json
+from pathlib import Path
 import safetensors
+import torch
 from safetensors.torch import load_file as safe_load_file
 from torch import load as load_file
+from model import Ex4bitLinear, ExLlamaConfig
 
 class ExLlamaLora:
     lora_path: str
@@ -43,7 +43,6 @@ class ExLlamaLora:
         if isinstance(lora_weights, Path):
             self.lora_path = str(lora_weights)
             if str(lora_weights).endswith(".safetensors"):
-                safetensors.torch.load(...)
                 f = safe_load_file(str(lora_weights), device = "cpu")
             else:
                 f = load_file(lora_weights, map_location = "cpu")
