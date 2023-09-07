@@ -1,7 +1,5 @@
 # from abc import ABC
 import torch
-#from torch.cuda.amp import custom_bwd, custom_fwd
-#from torch.utils.cpp_extension import load
 import os
 import sys
 import platform
@@ -40,29 +38,35 @@ if windows:
         else:
             print("Unable to find cl.exe; compilation will probably fail.", file=sys.stderr)
 
-# exllama_ext = load(
-#     name = extension_name,
-#     sources = [
-#         os.path.join(library_dir, "exllama_ext/exllama_ext.cpp"),
-#         os.path.join(library_dir, "exllama_ext/cuda_buffers.cu"),
-#         os.path.join(library_dir, "exllama_ext/cuda_func/q4_matrix.cu"),
-#         os.path.join(library_dir, "exllama_ext/cuda_func/q4_matmul.cu"),
-#         os.path.join(library_dir, "exllama_ext/cuda_func/column_remap.cu"),
-#         os.path.join(library_dir, "exllama_ext/cuda_func/rms_norm.cu"),
-#         os.path.join(library_dir, "exllama_ext/cuda_func/rope.cu"),
-#         os.path.join(library_dir, "exllama_ext/cuda_func/half_matmul.cu"),
-#         os.path.join(library_dir, "exllama_ext/cuda_func/q4_attn.cu"),
-#         os.path.join(library_dir, "exllama_ext/cuda_func/q4_mlp.cu"),
-#         os.path.join(library_dir, "exllama_ext/cpu_func/rep_penalty.cpp")
-#     ],
-#     extra_include_paths = [os.path.join(library_dir, "exllama_ext")],
-#     verbose = verbose,
-#     extra_ldflags = (["cublas.lib"] + ([f"/LIBPATH:{os.path.join(sys.base_prefix, 'libs')}"] if sys.base_prefix != sys.prefix else [])) if windows else [],
-#     extra_cuda_cflags = ["-lineinfo"] + (["-U__HIP_NO_HALF_CONVERSIONS__", "-O3"] if torch.version.hip else []),
-#     extra_cflags = ["-O3"]
-#     # extra_cflags = ["-ftime-report", "-DTORCH_USE_CUDA_DSA"]
-# )
-import exllama_ext
+
+if os.getenv("COMPILE_JIT"):
+    print("Compiling!")
+    from torch.cuda.amp import custom_bwd, custom_fwd
+    from torch.utils.cpp_extension import load
+    exllama_ext = load(
+        name = extension_name,
+        sources = [
+            os.path.join(library_dir, "exllama_ext/exllama_ext.cpp"),
+            os.path.join(library_dir, "exllama_ext/cuda_buffers.cu"),
+            os.path.join(library_dir, "exllama_ext/cuda_func/q4_matrix.cu"),
+            os.path.join(library_dir, "exllama_ext/cuda_func/q4_matmul.cu"),
+            os.path.join(library_dir, "exllama_ext/cuda_func/column_remap.cu"),
+            os.path.join(library_dir, "exllama_ext/cuda_func/rms_norm.cu"),
+            os.path.join(library_dir, "exllama_ext/cuda_func/rope.cu"),
+            os.path.join(library_dir, "exllama_ext/cuda_func/half_matmul.cu"),
+            os.path.join(library_dir, "exllama_ext/cuda_func/q4_attn.cu"),
+            os.path.join(library_dir, "exllama_ext/cuda_func/q4_mlp.cu"),
+            os.path.join(library_dir, "exllama_ext/cpu_func/rep_penalty.cpp")
+        ],
+        extra_include_paths = [os.path.join(library_dir, "exllama_ext")],
+        verbose = verbose,
+        extra_ldflags = (["cublas.lib"] + ([f"/LIBPATH:{os.path.join(sys.base_prefix, 'libs')}"] if sys.base_prefix != sys.prefix else [])) if windows else [],
+        extra_cuda_cflags = ["-lineinfo"] + (["-U__HIP_NO_HALF_CONVERSIONS__", "-O3"] if torch.version.hip else []),
+        extra_cflags = ["-O3"]
+        # extra_cflags = ["-ftime-report", "-DTORCH_USE_CUDA_DSA"]
+    )
+else:
+    import exllama_ext
 # from exllama_ext import set_tuning_params
 # from exllama_ext import prepare_buffers
 from exllama_ext import make_q4
