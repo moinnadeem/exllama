@@ -23,7 +23,7 @@ extra_compile_args = {
 if torch.version.hip:
     extra_compile_args["nvcc"].append("-U__HIP_NO_HALF_CONVERSIONS__")
 
-version = "0.0.15" + (f"+cu{CUDA_VERSION}" if CUDA_VERSION else f"+rocm{ROCM_VERSION}" if ROCM_VERSION else "")
+version = "0.0.16" + (f"+cu{CUDA_VERSION}" if CUDA_VERSION else f"+rocm{ROCM_VERSION}" if ROCM_VERSION else "")
 setup(
     name="exllama",
     version=version,
