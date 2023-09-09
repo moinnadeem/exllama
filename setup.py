@@ -5,12 +5,11 @@ import os
 import subprocess
 import torch
 
-def get_cuda_version(cuda_home=os.environ.get('CUDA_PATH', '') if platform.system() == "Windows" else os.environ.get('CUDA_HOME', '')):
+def get_cuda_version(cuda_home=os.environ.get('CUDA_PATH', os.environ.get('CUDA_HOME', ''))):
     if cuda_home == '' or not os.path.exists(os.path.join(cuda_home,"bin","nvcc.exe" if platform.system() == "Windows" else "nvcc")):
         return ''
-    version_str = subprocess.check_output([os.path.join(cuda_home,"bin","nvcc"),"--version"])
-    version_str=str(version_str).replace('\n', '').replace('\r', '')
-    idx=version_str.find("release")
+    version_str = subprocess.check_output([os.path.join(cuda_home,"bin","nvcc"),"--version"]).decode('utf-8')
+    idx = version_str.find("release")
     return version_str[idx+len("release "):idx+len("release ")+4]
     
 CUDA_VERSION = "".join(get_cuda_version().split(".")) if not os.environ.get('ROCM_VERSION', False) else False
@@ -23,7 +22,7 @@ extra_compile_args = {
 if torch.version.hip:
     extra_compile_args["nvcc"].append("-U__HIP_NO_HALF_CONVERSIONS__")
 
-version = "0.0.16" + (f"+cu{CUDA_VERSION}" if CUDA_VERSION else f"+rocm{ROCM_VERSION}" if ROCM_VERSION else "")
+version = "0.0.17" + (f"+cu{CUDA_VERSION}" if CUDA_VERSION else f"+rocm{ROCM_VERSION}" if ROCM_VERSION else "")
 setup(
     name="exllama",
     version=version,
