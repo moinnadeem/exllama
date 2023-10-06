@@ -84,7 +84,6 @@ jobs:
           file_glob: true
           overwrite: true
           release_name: ${{ steps.build-wheel.outputs.PACKAGE_VERSION }}
-          body: "Wheels are compiled with CUDA 11.7 and 11.8 for Windows and Linux x64"
           
   build_rocm:
     name: Build ROCm Wheels & Release
