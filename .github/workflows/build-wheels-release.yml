@@ -56,18 +56,31 @@ jobs:
           $cudaNum = [int]$cudaVersion.substring($cudaVersion.LastIndexOf('.')+1)
           while ($cudaNum -ge 0) { $cudaChannels += '-c nvidia/label/cuda-' + $cudaVersion.Remove($cudaVersion.LastIndexOf('.')+1) + $cudaNum + ' '; $cudaNum-- }
           mamba install -y 'cuda' $cudaChannels.TrimEnd().Split()
-          if ([version]$env:CUDAVER -gt [version]'11.8.0') {$torchver = "--pre --index-url https://download.pytorch.org/whl/nightly/cu$cudaVersionPytorch"} else {$torchver = "--index-url https://download.pytorch.org/whl/cu$cudaVersionPytorch"}
-          python -m pip install torch $torchver.split()
-          python -m pip install build wheel safetensors sentencepiece ninja
+          if (!(mamba list cuda)[-1].contains('cuda')) {sleep -s 10; mamba install -y 'cuda' $cudaChannels.TrimEnd().Split()}
+          if (!(mamba list cuda)[-1].contains('cuda')) {throw 'CUDA Toolkit failed to install!'}
+          
+          if ([version]$env:CUDAVER -lt [version]'11.8.0') {$torch = "torch==2.0.1"} else {$torch = "torch==2.1.0"}
+          
+          python -m pip install --upgrade build setuptools wheel ninja $torch --extra-index-url "https://download.pytorch.org/whl/cu$cudaVersionPytorch"
         
       - name: Build Wheel
         id: build-wheel
         run: |
-          if ($(Get-Content 'setup.py' -raw) -match 'version = "(\d+\.(?:\d+\.?)*)" \+ \(') {Write-Output $('::notice file=build-wheels-release.yml,line=53,title=Package Version::Detected package version is: {0}' -f $Matches[1]); Write-Output "PACKAGE_VERSION=$($Matches[1])" >> "$env:GITHUB_OUTPUT"} else {Write-Output '::error file=build-wheels-release.yml,line=41::Could not parse version from setup.py! You must upload wheels manually!'; Write-Output "PACKAGE_VERSION=None" >> "$env:GITHUB_OUTPUT"}
+          if ($(Get-Content 'setup.py' -raw) -match 'version = "(\d+\.(?:\d+\.?)*)" \+ \(')
+          {
+              Write-Output $('::notice file=build-wheels-release.yml,line=53,title=Package Version::Detected package version is: {0}' -f $Matches[1])
+              Write-Output "PACKAGE_VERSION=$($Matches[1])" >> "$env:GITHUB_OUTPUT"
+          } else {
+              Write-Output '::error file=build-wheels-release.yml,line=41::Could not parse version from setup.py! You must upload wheels manually!'
+              Write-Output "PACKAGE_VERSION=None" >> "$env:GITHUB_OUTPUT"
+          }
+          
           $env:CUDA_PATH = $env:CONDA_PREFIX
           $env:CUDA_HOME = $env:CONDA_PREFIX
           if ($IsLinux) {$env:LD_LIBRARY_PATH = $env:CONDA_PREFIX + '/lib:' + $env:LD_LIBRARY_PATH}
+          
           $env:TORCH_CUDA_ARCH_LIST = if ([version]$env:CUDAVER -lt [version]'11.8') {'6.0 6.1 7.0 7.5 8.0 8.6+PTX'} else {'6.0 6.1 7.0 7.5 8.0 8.6 8.9 9.0+PTX'}
+          
           python -m build -n --wheel
         
       - uses: actions/upload-artifact@v3
