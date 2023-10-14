@@ -1,7 +1,7 @@
-from model import ExLlama, ExLlamaCache, ExLlamaConfig
-from tokenizer import ExLlamaTokenizer
-from generator import ExLlamaGenerator
-from lora import ExLlamaLora
+from exllama.model import ExLlama, ExLlamaCache, ExLlamaConfig
+from exllama.tokenizer import ExLlamaTokenizer
+from exllama.generator import ExLlamaGenerator
+from exllama.lora import ExLlamaLora
 import perplexity
 from perplexity import Perplexity
 import time

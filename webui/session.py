@@ -1,6 +1,6 @@
-from model import ExLlama, ExLlamaCache, ExLlamaConfig
-from tokenizer import ExLlamaTokenizer
-from generator import ExLlamaGenerator
+from exllama.model import ExLlama, ExLlamaCache, ExLlamaConfig
+from exllama.tokenizer import ExLlamaTokenizer
+from exllama.generator import ExLlamaGenerator
 import time
 import torch
 import os
@@ -310,7 +310,16 @@ class Session:
 
         # Add model info
 
-        model_str = os.path.splitext(os.path.basename(model.config.model_path))[0] + "\n"
+        def _common_chars(names):
+            cname = max(names, key=len)
+            for x in names:
+                for p, c in enumerate(x):
+                    if c != cname[p] and cname[p] != "*": cname = cname[:p] + "*" + cname[p + 1:]
+            return cname
+
+        mp = model.config.model_path if isinstance(model.config.model_path, str) else _common_chars(model.config.model_path)
+
+        model_str = os.path.splitext(os.path.basename(mp))[0] + "\n"
         model_str += f"Sequence length: {model.config.max_seq_len}\n"
 
         dic["model_info"] = model_str.strip()

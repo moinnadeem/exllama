@@ -1,7 +1,7 @@
-import cuda_ext
-from model import ExLlama, ExLlamaCache
-from tokenizer import ExLlamaTokenizer
-from lora import ExLlamaLora
+from . import cuda_ext
+from .model import ExLlama, ExLlamaCache
+from .tokenizer import ExLlamaTokenizer
+from .lora import ExLlamaLora
 import torch
 import torch.nn.functional as F
 

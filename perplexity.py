@@ -1,6 +1,6 @@
-from model import ExLlama, ExLlamaCache, ExLlamaConfig
-from tokenizer import ExLlamaTokenizer
-from generator import ExLlamaGenerator
+from exllama.model import ExLlama, ExLlamaCache, ExLlamaConfig
+from exllama.tokenizer import ExLlamaTokenizer
+from exllama.generator import ExLlamaGenerator
 
 import json
 import math

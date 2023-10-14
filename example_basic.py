@@ -1,6 +1,6 @@
-from model import ExLlama, ExLlamaCache, ExLlamaConfig
-from tokenizer import ExLlamaTokenizer
-from generator import ExLlamaGenerator
+from exllama.model import ExLlama, ExLlamaCache, ExLlamaConfig
+from exllama.tokenizer import ExLlamaTokenizer
+from exllama.generator import ExLlamaGenerator
 import os, glob
 
 # Directory containing model, tokenizer, generator
@@ -12,7 +12,7 @@ model_directory =  "/mnt/str/models/llama-13b-4bit-128g/"
 tokenizer_path = os.path.join(model_directory, "tokenizer.model")
 model_config_path = os.path.join(model_directory, "config.json")
 st_pattern = os.path.join(model_directory, "*.safetensors")
-model_path = glob.glob(st_pattern)[0]
+model_path = glob.glob(st_pattern)
 
 # Create config, model, tokenizer and generator
 

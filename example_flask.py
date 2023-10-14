@@ -1,7 +1,7 @@
-from model import ExLlama, ExLlamaCache, ExLlamaConfig
+from exllama.model import ExLlama, ExLlamaCache, ExLlamaConfig
 from flask import Flask, request
-from tokenizer import ExLlamaTokenizer
-from generator import ExLlamaGenerator
+from exllama.tokenizer import ExLlamaTokenizer
+from exllama.generator import ExLlamaGenerator
 import os, glob
 
 # Directory containing config.json, tokenizer.model and safetensors file for the model
@@ -10,7 +10,7 @@ model_directory = "/mnt/str/models/llama-7b-4bit/"
 tokenizer_path = os.path.join(model_directory, "tokenizer.model")
 model_config_path = os.path.join(model_directory, "config.json")
 st_pattern = os.path.join(model_directory, "*.safetensors")
-model_path = glob.glob(st_pattern)[0]
+model_path = glob.glob(st_pattern)
 
 config = ExLlamaConfig(model_config_path)               # create config from config.json
 config.model_path = model_path                          # supply path to model weights file

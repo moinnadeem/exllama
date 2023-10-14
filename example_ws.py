@@ -3,10 +3,10 @@ import websockets
 import json
 from sentencepiece import SentencePieceProcessor
 
-from model import ExLlama, ExLlamaCache, ExLlamaConfig
-from lora import ExLlamaLora
-from tokenizer import ExLlamaTokenizer
-from generator import ExLlamaGenerator
+from exllama.model import ExLlama, ExLlamaCache, ExLlamaConfig
+from exllama.lora import ExLlamaLora
+from exllama.tokenizer import ExLlamaTokenizer
+from exllama.generator import ExLlamaGenerator
 import argparse
 import torch
 import sys
@@ -199,7 +199,7 @@ async def oneShotInfer(request, ws):
 
 async def streamInfer(request, ws):
     stopToken = [tokenizer.eos_token_id]
-    stopToken.append(request["stopToken"])
+    stopToken += request["stopToken"].split(',')
     prompt = request["text"]
     maxNew = int(request["maxNew"])
     top_p = float(request["top_p"])
