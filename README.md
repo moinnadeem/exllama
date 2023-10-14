@@ -1,3 +1,22 @@
+### This is a python module version of ExLlama
+The pupose of this is to allow for one-time building of the CUDA kernels.
+
+To build the module, install the CUDA Toolkit or ROCm SDK along with the appropriate Pytorch version that you intend to use.
+Full list of requirements are listed below. After this, you can install the module with:
+```
+python -m pip install git+https://github.com/jllllll/exllama
+```
+Or you can build a wheel with:
+```
+python -m pip wheel git+https://github.com/jllllll/exllama --no-deps
+```
+The CUDA version used to build the wheel will be appended to the version number automatically.  
+ROCm version can be appended by defining the `ROCM_VERSION` environment variable: `ROCM_VERSION=5.4.2`
+
+Pre-built wheels are available in the releases.
+
+---
+
 # ExLlama
 
 A standalone Python/C++/CUDA implementation of Llama for use with 4-bit GPTQ weights, designed to be fast and
@@ -17,7 +36,7 @@ have no AMD devices to test or optimize on.
 
 * Python 3.9 or newer
 * `torch` tested on 2.0.1 and 2.1.0 (nightly) with cu118
-* `safetensors` 0.3.1
+* `safetensors` 0.3.2
 * `sentencepiece`
 * `ninja`
 
@@ -191,3 +210,13 @@ Moved the todo list [here](doc/TODO.md).
 **2023-01-09**: Added rope_theta parameter for (at least partial) CodeLlama support. If you were using alpha = 97
 or similar, you would no longer need that for CodeLlama models. Still stuff to sort out regarding the extended
 vocabulary.
+
+**2023-08-09**: Added support for sharded models. `config.model_path` now accepts either a filename or a list of
+filenames. `model_init()` will detect multiple .safetensors files if given a model directory. Note the change in the
+various examples: `model_path = glob.glob(st_pattern)[0]` becomes simply `model_path = glob.glob(st_pattern)`. Also
+there's a little script in `util/shard.py` to split large .safetensors files. It also produces an index.json file for
+the sharded model, just for completeness, although ExLlama doesn't need it to read the shards. Note that the 
+**safetensors dependency was bumped to version 0.3.2**. 
+
+**2023-08-12**: Preliminary, initial and tentative release of [ExLlamaV2](https://github.com/turboderp/exllamav2).
+It doesn't do all the things that ExLlamaV1 does, yet, but it's better at what it does do. So check it out!

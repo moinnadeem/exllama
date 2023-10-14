@@ -1,7 +1,7 @@
-from model import ExLlama, ExLlamaCache, ExLlamaConfig
-from lora import ExLlamaLora
-from tokenizer import ExLlamaTokenizer
-from alt_generator import ExLlamaAltGenerator
+from exllama.model import ExLlama, ExLlamaCache, ExLlamaConfig
+from exllama.lora import ExLlamaLora
+from exllama.tokenizer import ExLlamaTokenizer
+from exllama.alt_generator import ExLlamaAltGenerator
 import argparse
 import torch
 import sys
